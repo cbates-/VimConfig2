@@ -1,0 +1,590 @@
+"  Zing.
+"  Really need to add update log....
+"  20151210   Added different MRU.  Added BufExplorer.
+"  12/09/2015 3:48:00 PM
+"            Trimmed several plugins, most notably unite.  Seems to improve
+"            performance.
+"  20150602   Added VimLeave event handler to clean up sessions files 
+"       (remove Args lines)
+"
+"  20150820   Set filetype for xaml -> xml
+"  20150225   Checked in on LastMod(), verified it was working
+"  20150126   Set .ini files to ReadOnly when opening.
+"               .log files, too.
+"
+
+set nocompatible
+" echo "_vimrcCommon"
+
+" I don't think $VIMRUNTIME is set to anything...
+" Yes, it is: VIM=C:\Program Files\Vim\vim74 " 
+" I think this is set by gvim when it starts up.
+" echo "_vimrcCommon   VIMRUNTIME: " $VIMRUNTIME
+" echo "_vimrcCommon   VIM: " $VIM
+" echo "_vimrcCommon   HOME: " $HOME
+
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+" Helps with tag matching in xml files (among others)
+runtime macros/matchit.vim
+
+" From  http://stackoverflow.com/a/2104161, trying to improve file load performance
+set directory=$HOME/tmp
+set backupdir=$HOME/tmp
+" let g:loaded_matchparen = 1
+
+
+filetype off
+" :scrip[tnames]	List all sourced script names, in the order they were
+"                   first sourced.  The number is used for the script ID
+" source $_CommonConfig/vim/vimfiles/plugin/scriptnames.vim
+
+source $_CommonConfig/vim/pages.vim
+
+"
+" -----------------------------------------------------------------
+"         VUNDLE
+" -----------------------------------------------------------------
+"
+set rtp+=$_CommonConfig/vim/vimfiles/bundle/vundle/
+set rtp+=$_CommonConfig/vim/vimfiles/
+
+let path='$_CommonConfig/vim/vimfiles/bundle'
+call vundle#rc(path)
+
+Bundle 'gmarik/vundle'
+
+Bundle 'yegappan/mru'
+
+" -------------------- Shougo plugins
+" Bundle 'Shougo/unite.vim'
+" Bundle 'Shougo/neomru.vim'  " neomru uses unite, which feels pretty heavy
+" Bundle 'Shougo/vimproc.vim'
+"
+" Need to build a new version of the vimproc dll; vimshell won't work as is.
+" Bundle 'Shougo/vimproc.vim'
+" Bundle 'Shougo/vimshell.vim'
+
+" Not often used.  Load as nec. to save time on startup
+Bundle 'tpope/vim-fugitive'
+" Bundle 'tpope/vim-git'
+
+" Not as useful as I thought it would be.
+" Can be loaded manually when necessary.
+Bundle 'tpope/vim-surround'
+
+"
+" -------------------- mhinz plugins
+Bundle 'mhinz/vim-startify'
+
+" indicate mods based on SCM
+" Looks like huge performance hit when loading files from UNC,
+"    'cuz the command line doesn't work with UNC...
+Bundle 'mhinz/vim-signify'
+
+" -------------------- xolox plugins
+Bundle 'xolox/vim-misc'
+Bundle 'xolox/vim-session'
+
+Bundle 'PProvost/vim-ps1'
+Bundle 'scrooloose/nerdcommenter'
+let NERDSpaceDelims = 1
+
+" ----------- snipmate
+" Working for .cs
+" https://github.com/garbas/vim-snipmate
+" Bundle 'MarcWeber/vim-addon-mw-utils'
+" Bundle 'tomtom/tlib_vim'
+" Bundle 'garbas/vim-snipmate'
+" Optional:
+" Bundle 'honza/vim-snippets'
+
+" This uses .cs settings when a .ps1 file is loaded.
+" let g:snipMate = {}
+" let g:snipMate.scope_aliases = {}
+" let g:snipMate.scope_aliases['ps1'] = 'ps1,cs'
+" let g:snipMate.scope_aliases['psm1'] = 'psm1,cs'
+" ----------- end snipmate
+
+" Bundle 'vim-scripts/foldsearch'
+
+" A context-sensitive sort of replace.
+" https://github.com/pelodelfuego/vim-swoop
+" Bundle 'pelodelfuego/vim-swoop'
+
+
+" Neither of these handle auto-indent very well for PowerShell, seems to work
+" ok for c#.
+" Bundle 'Raimondi/delimitMate'
+" let delimitMate_expand_cr=1
+
+
+" --------------- Airline ---------------
+" Pretty cool
+Bundle 'bling/vim-airline-themes'
+Bundle 'bling/vim-airline'
+let g:airline#extensions#tabline#enabled=1
+" let g:airline#extensions#tabline#buffer_idx_mode = 1
+
+let g:airline#extensions#tabline#buffer_nr_show = 1
+
+let g:airline#extensions#tabline#fnametruncate = 18
+
+" * configure whether close button should be shown
+" let g:airline#extensions#tabline#show_close_button = 1
+
+" * configure symbol used to represent close button
+" let g:airline#extensions#tabline#close_symbol = 'X'
+
+" Here is how you can define a 'foo' formatter:
+" function! airline#extensions#tabline#foo#format(bufnr, buffers)
+"   return fnamemodify(bufname(a:bufnr), ':t')
+" endfunction
+" let g:airline#extensions#tabline#formatter = 'foo'
+"
+" let g:airline#extensions#tabline#formatter = 'myformatter'
+let g:airline#extensions#tabline#fnamemod = ':t'
+
+" let g:airline_theme='distinguished'
+let g:airline_theme='luna'
+" let g:airline_theme='raven'
+" let g:airline_theme='serene'
+" let g:airline_section_x=''
+" let g:airline_section_y='%Y'
+let g:airline_exclude_preview = 1
+"
+" Makes the airline statusline visible w/o a split
+set laststatus=2
+
+" --------------- end Airline ---------------
+
+" --------------- Tagbar ---------------
+" Tags buffers on the fly into temp file. Cool.
+" Disabling, to see if this is the performance killer when opening a file.
+Bundle 'majutsushi/tagbar'
+
+let g:tagbar_ctags_bin='C:\ProgramData\chocolatey\bin\ctags.exe'
+let g:tagbar_autoshowtag=1
+let g:tagbar_autopreview=0
+
+
+" Not ready for prime time.  Reports every usage as new variable.  Doesn't
+" distinguish when in comments.
+" \ 'v:variable'
+
+let g:tagbar_type_ps1 = {
+	\ 'ctagstype' : 'powershell',
+	\ 'kinds'     : [
+		\ 'f:function',
+		\ 'i:filter',
+		\ 'a:alias'
+	\ ]
+\ }
+
+let g:tagbar_type_dosini = {
+	\ 'ctagstype' : 'inifile',
+	\ 'kinds'     : [
+		\ 's:section'
+	\ ]
+\ }
+
+
+set <F8>=<C-v><F8>
+noremap <F8> :TagbarToggle<CR>
+
+" :TagbarOpenAutoClose                                    *:TagbarOpenAutoClose*
+    " Open the Tagbar window, jump to it and close it on tag selection. This is
+    " an alias for ":TagbarOpen fjc".
+set <F7>=<C-v><F7>
+noremap <F7> :TagbarOpenAutoClose<CR>
+
+" --------------- end Tagbar ---------------
+
+
+" Accelerators to add timestamp to file
+nnoremap <F5> "=strftime("%c")<CR>P
+inoremap <F5> <C-R>=strftime("%c")<CR>
+
+nnoremap <F6> "=strftime("%Y%m%d")<CR>P
+inoremap <F6> <C-R>=strftime("%Y%m%d")<CR>
+
+" 
+" ------------- TESTING
+"  Not sure I like this yet...
+" Bundle 'vim-scripts/AutoComplPop'
+" ------------- END TESTING
+" 
+
+" Not ready for this yet.  Supposed to implement Perl-style regex.
+" Need to do more research.
+" Bundle 'othree/eregex.vim'
+
+" Sparkup is for easy HTML coding
+"   Don't remember the equivalent on VisStudio - 'fluent'?
+" Bundle 'rstacruz/sparkup'
+"
+" Finally - a decent multi-buffer grep
+Bundle 'jeetsukumaran/vim-buffersaurus'
+
+"
+" -----  Color schemes  -------------------------
+Bundle 'cocopon/iceberg.vim'
+Bundle 'cocopon/iceberg2.vim'
+" Bundle 'Lokaltog/vim-distinguished'
+" Bundle 'altercation/vim-colors-solarized'
+Bundle 'matthewtodd/vim-twilight'
+Bundle 'vim-scripts/phd'
+Bundle 'sickill/vim-monokai'
+" ------------------------------
+"
+filetype plugin indent on     " required
+
+" This opens a new buffer every time the buf list is shown!  Not good.
+" Bundle 'vim-scripts/quickBuf--Viau'
+"
+Bundle 'jlanzarotta/bufexplorer'
+
+"
+" ---------------------------------------------------------------------
+"         END VUNDLE
+" ---------------------------------------------------------------------
+"
+
+" let g:syntastic_js_checkers = ['jslint']
+" let g:syntastic_javascript_checkers = ['jslint']
+
+" vim-sessions plugin ----------------------
+let g:session_autosave='yes'
+let g:session_autosave_to='default'
+let g:session_autosave_periodic=2
+let g:session_verbose_messages=0
+let g:session_default_to_last='yes'
+
+" ------------------------------------------
+
+set sessionoptions ="buffers,curdir,folds,help,tabpages,winsize"
+
+filetype plugin indent on       " enable detection, plugins and indenting in one step
+
+"
+" let g:signify_vcs_list = [ 'git', 'svn' ]
+let g:signify_vcs_list = [ 'git' ]
+
+" Need to experiment with this.
+" set foldcolumn=4
+
+set diffexpr=MyDiff()
+set ignorecase
+set incsearch
+set nowrap
+" set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]%{fugitive#statusline()}
+set showmatch
+set mat=30
+" set matchpairs+=<:>
+
+" From: http://vim.wikia.com/wiki/Change_statusline_color_to_show_insert_or_normal_mode
+" first, enable status line always
+" set laststatus=2
+
+" DONT LIKE THIS COLOR CHOICE
+" now set it up to change the status line based on mode
+" if version >= 700
+  " au InsertEnter * hi StatusLine term=reverse ctermbg=5 gui=undercurl guisp=Magenta
+  " au InsertLeave * hi StatusLine term=reverse ctermfg=0 ctermbg=2 gui=bold,reverse
+" endif
+" -----------------------
+
+"  From fugitive help
+" set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
+set guioptions=egmrLtTb
+
+" From: https://github.com/majutsushi/tagbar/issues/252#issuecomment-89730497
+set noequalalways
+
+" This really should be done in each local _vimrc....
+" For gvim on Surface Pro 3
+if $COMPUTERNAME == "cbSurface3"
+    set guifont=Consolas:h11:cANSI
+"   echo "cbSurface3"
+elseif $COMPUTERNAME == "Blargle"
+    echo "Blargle"
+elseif $COMPUTERNAME == "VS2015-Comm"
+    set guifont=Consolas:h12:cANSI
+else
+"   echo $COMPUTERNAME
+    set hidden
+endif
+
+" with hidden=on, when switching away from a buffer the buffer is hiddden,not closed.
+" with hidden=off, switching away from edited buffer will provoke the 
+" 'unsaved changes' warning
+set hidden
+set autowrite
+
+" According to Help, when autochdir is 'on' some plugins might not work as
+" expected.
+set autochdir
+set wildmode=list:longest
+set wildmenu
+
+" basic yank/delete will go to Windows clipboard
+:set clipboard=unnamed
+
+" colorscheme phd
+" colorscheme desert
+" colorscheme darkblue
+colorscheme iceberg2
+
+" for zt, zb, leave 3 lines of breathing room
+set scrolloff=2
+
+set sidescroll=4
+set sidescrolloff=4
+
+
+" For displaying whitespace.  Probably need to set colorscheme to something like 'desert'.
+set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+" To display whitespace, use:
+" set lsit
+
+set smartindent
+" tab instead of spaces
+set noexpandtab
+"
+" 4 stops
+set tabstop=4
+set shiftwidth=4
+
+" From:  http://amix.dk/vim/vimrc.html ------------
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
+" When searching try to be smart about cases 
+set smartcase
+
+" Highlight search results
+set hlsearch
+
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+" For regular expressions turn magic on
+set magic
+
+set nobackup
+"
+" Disable highlight when <leader><cr> is pressed
+map <silent> <leader><cr> :noh<cr>
+
+
+" From: http://stackoverflow.com/a/4468491/107037
+" Close buffer w/o closing window (when in split window)
+nmap <silent> <leader>d :bp\|bd #<CR>
+" End From -----------------------------------------
+
+if has('win32')
+  " Avoid mswin.vim making Ctrl-v act as paste
+  noremap <C-V> <C-V>
+  " something was mapping C-Y to C-R (redo) 
+  " -- C-Y should be scroll screen in normal mode
+  noremap <C-Y> <C-Y>
+endif
+
+"
+" ---------------  KEY MAPPING ------------------------------------------------
+"
+" From: http://stackoverflow.com/a/4848672/107037
+    " i to into Insert mode, ii to leave Insert mode
+inoremap ii <Esc> 
+    " Ctrl-c also returns to Normal mode.
+
+" From:  http://stackoverflow.com/a/4522351
+" inoremap { {<CR>}<Esc>ko
+"
+
+" From: http://vim.wikia.com/wiki/Search_for_visually_selected_text
+" Search for selected text
+vnoremap // y/<C-R>"<CR>
+
+
+" ------------ <leader>  mappings  <leader> is '\' key -------------------
+" 
+" ------------  Unite mappings
+" nnoremap <leader>f :<C-u>Unite file<CR>
+" nnoremap <leader>ff :<C-u>UniteWithBufferDir -start-insert file<CR>
+" nnoremap <leader>fr :<C-u>Unite -start-insert file_rec<CR>
+
+" call unite#filters#matcher_default#use(['matcher_fuzzy'])
+" map <leader>mru :Unite -start-insert file_mru<cr>
+" map <leader>be :Unite -start-insert buffer<cr>
+"
+" ------------  NEOMRU settings
+" let g:neomru#do_validate=1
+" let g:neomru#file_mru_limit=24
+"
+" Yank history
+" let g:unite_source_history_yank_enable = 1
+" nnoremap <leader>y :<C-u>Unite history/yank<CR> 
+
+" Insert file bookmark -- Unite functionality
+" nnoremap <silent> <leader>fbm :<C-u>UniteBookmarkAdd<CR>
+" Browse bookmarks
+" nnoremap <silent> <leader>bm :<C-u>Unite bookmark<CR>
+
+" REDO IF UNITE IS RE-ENAABLED
+" call unite#custom#source('file_mru,file_rec,file_rec/async,ack,ag', 'ignore_pattern', join(['\.git/', '\.tmp/', 'Temp/', 'tmp/', 'bundle/'], '\|'))
+
+"  Lighter MRU functionality
+map <leader>mru :MRU <cr>
+
+
+" 'Run' current file.
+nnoremap <leader>r :!%:p<Enter><Enter>
+
+"
+" ------------ tab command mappings -------------------- 
+"
+map <leader>tt :tabnew<cr>
+map <leader>tn :tabnext<cr>
+map <leader>tp :tabprevious<cr>
+map <leader>tc :tabclose<cr>
+
+
+" Re-map '<' and '>' to perform their normal action, but then maintain the
+" selection so the action can immediately be performed again.
+vmap < <gv
+vmap > >gv
+
+" From: http://vim.wikia.com/wiki/Delete_files_with_a_Vim_command
+" command! -complete=file -nargs=1 Remove :echo 'Remove: '.'<f-args>'.' '.(delete(<f-args>) == 0 ? 'SUCCEEDED' : 'FAILED')
+
+
+
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+endfunction
+
+" From: http://stackoverflow.com/a/3962107/107037  
+    function! PopOutOfInsertMode()
+        if v:insertmode
+            feedkeys("\<C-\>\<C-n>")
+        endif
+    endfunction
+
+if !exists("autocommands_loaded")
+    let autocommands_loaded = 1
+    au FocusLost * wa
+    "
+    " Hell, yeah, this is what I'm talking about:  http://goo.gl/8V8AFH
+	au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+
+    " From: http://stackoverflow.com/a/3962107/107037
+	" Not working so well, 1/5/2016 5:16:34 PM?
+    " autocmd FocusLost * call PopOutOfInsertMode()
+
+    " fdm is FoldMethod, fml is FoldMinLines
+    autocmd FileType cs setlocal fdm=indent fml=1 shiftwidth=4 tabstop=4 cms="// %s"
+    autocmd FileType css setlocal fdm=indent fml=1 shiftwidth=2 tabstop=2
+    autocmd FileType ps1 setlocal fdm=indent fml=1 
+    autocmd FileType linq setlocal cms="// %s" fdm=indent fml=1 
+
+    " From 'Learning the Vi and Vim Editors' 
+    " Took some tuning, but finally got it working
+    au FileWritePre,BufWritePre *.ps1 mark s|call LastMod()|'s 
+    au FileWritePre,BufWritePre *.psm1 mark s|call LastMod()|'s 
+    au FileWritePre,BufWritePre *.psd1 mark s|call LastMod()|'s 
+    " au FileWritePre,BufWritePre *.txt mark s|call LastMod()|'s 
+    fun LastMod() 
+        " if there are more than 20 lines, set our max to 20, otherwise, scan 
+        " entire file. 
+        if line(" $") > 20 
+            let lastModifiedline = 20 
+        else 
+            let lastModifiedline = line(" $") 
+        endif 
+        " exe "1," . lastModifiedline . "g/ Last modified: /s/ Last modified: .*/ Last modified: " strftime("%Y %b %d") 
+        set ignorecase
+        exe "1,$g/ last modified: /s/ last modified: .*/ Last Modified: " strftime("%Y %b %d %X")
+    endfun
+
+   let g:ps1_nofold_blocks = 1
+
+    "--------- VimLeave ---------------------
+    " From: http://stackoverflow.com/a/30613046/107037
+    " This works, mostly.
+    " Unfortunately, this is removing files that were opened during the
+    " session, and are still open when vim exits...
+    " au VimLeave * execute ' silent !' . shellescape($_CommonConfig . '/vim/cleanSessions.cmd', 1)
+    "----------------------------------------
+
+endif
+
+" ---------------------------  AutoLoad  ---------------------------------
+" TextWidth and FormatOptions
+" au FileType readme tw=72, fo+=t
+au FileType txt tw=72, fo+=t
+
+" Set these to read-only to try to prevent changes to production files...
+au FileReadPre,BufReadPre *.ini  set readonly
+
+au FileReadPre,BufReadPre *.log  set readonly
+au FileReadPre,BufReadPre *.config  set readonly
+"
+" PowerShell
+au BufNewFile,BufRead *.ps1,*.psm1,*.psd1 setf ps1
+" if has("gui_running")
+    " autocmd BufEnter *.ps1 nested TagbarOpen
+    " autocmd BufEnter *.psm1 nested TagbarOpen
+" endif
+
+
+" Don't want ps1 files auto-folded when opened
+au BufReadPost *.ps1 normal zR
+au BufAdd *.ps1 normal zR
+autocmd Syntax ps1 normal zR
+au BufReadPost *.psm1 normal zR
+au BufAdd *.psm1 normal zR
+autocmd Syntax psm1 normal zR
+
+" Don't want linq files auto-folded when opened
+au BufNewFile,BufRead *.linq set filetype=cs
+au BufReadPost *.linq normal zR
+au BufAdd *.linq normal zR
+autocmd Syntax linq normal zR
+"
+" Don't want C# files auto-folded when opened
+au BufReadPost *.cs normal zR
+au BufAdd *.cs normal zR
+autocmd Syntax cs normal zR
+
+au BufNewFile,BufRead *.xaml set filetype=xml
+
+
+:highlight Folded  guifg=white
+
+command! CopyFileName let @*=substitute(expand("%:p"), '/', '\', 'g')
+
+" This and that

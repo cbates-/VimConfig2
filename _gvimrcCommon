@@ -1,0 +1,16 @@
+"  GVIm-specific config.  Loaded in addition to _vimrc? 
+"
+" echo "_gvimrcCommon"
+"
+set lines=50 columns=130
+
+" Bundle 'Conque_2.3'
+
+" ------------------------------ EXPERIMENT----------------------------------
+"  I think this creates a new instance of PS for each use -- very cumbersome.
+" change to powershell 
+" set shell=powershell.exe\ -NoProfile\ -ExecutionPolicy\ Unrestricted 
+" set shellcmdflag=-Command 
+" set shellpipe=> 
+" set shellredir=> 
+" ---------------------------END EXPERIMENT----------------------------------

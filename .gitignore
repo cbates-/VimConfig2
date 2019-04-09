@@ -1,0 +1,13 @@
+VERSION
+obj
+*.swp
+*.swo
+*.*~
+*~
+minivimrc
+vimfiles/bundle/**
+vimfiles/sessions/**
+bundle/**
+~bundle/vundle
+~vimfiles/bundle/vundle
+~vimfiles/bundle/vimproc.vim/autoload/vimproc_win32.dll

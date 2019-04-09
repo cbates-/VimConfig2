@@ -1,0 +1,7 @@
+"  GVIm-specific config.  Loaded in addition to _vimrc? 
+"
+" echo "_gvimrc"
+"
+source $_CommonConfig/vim/_gvimrcCommon
+
+set guifont=Consolas:h12:cANSI

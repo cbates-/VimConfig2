@@ -1,0 +1,395 @@
+"
+"  Really need to add update log....
+"
+set nocompatible
+" echo "_vimrcCommon"
+
+" I don't think $VIMRUNTIME is set to anything...
+" Yes, it is: VIM=C:\Program Files\Vim\vim74 " 
+" I think this is set by gvim when it starts up.
+" echo "_vimrcCommon   VIMRUNTIME: " $VIMRUNTIME
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+" Helps with tag matching in xml files (among others)
+runtime macros/matchit.vim
+
+
+filetype off
+" NO LONGER USING PATHOGHEN
+" call pathogen#runtime_append_all_bundles()
+" call pathogen#helptags()
+" call pathogen#infect()
+
+source $_skydrive/vim/vimfiles/plugin/scriptnames.vim
+
+"
+" ------- VUNDLE ------------------------------
+"
+set rtp+=$_skydrive/vim/vimfiles/bundle/vundle/
+let path='$_skydrive/vim/vimfiles/bundle'
+call vundle#rc(path)
+
+Bundle 'gmarik/vundle'
+Bundle 'Shougo/unite.vim'
+
+Bundle 'Shougo/neomru.vim'
+" Bundle 'Shougo/vimproc.vim'
+
+Bundle 'tpope/vim-fugitive'
+Bundle 'tpope/vim-git'
+
+" Not as useful as I thought it would be.
+" Can be loaded manually when necessary.
+" Bundle 'tpope/vim-surround'
+
+" indicate mods based on SCM
+Bundle 'mhinz/vim-signify'
+
+Bundle 'xolox/vim-misc'
+Bundle 'xolox/vim-session'
+
+" Requires VIM compiled with Python
+" Bundle 'mbadran/headlights'
+
+Bundle 'PProvost/vim-ps1'
+Bundle 'scrooloose/nerdcommenter'
+
+" Bundle 'msanders/snipmate.vim'
+
+" Bundle 'vim-scripts/foldsearch'
+" Bundle 'vim-scripts/Buffer-grep'
+
+" --------------- Airline ---------------
+" Pretty cool, not sure I'm ready for it...
+Bundle 'bling/vim-airline'
+let g:airline#extensions#tabline#enabled=1
+let g:airline_theme='luna'
+" let g:airline_theme='raven'
+" let g:airline_theme='serene'
+" let g:airline_section_x=''
+" let g:airline_section_y='%Y'
+"
+" Makes the airline statusline visible w/o a split
+set laststatus=2
+" --------------- ------ ---------------
+
+" --------------- LightLine ---------------
+" https://github.com/itchyny/lightline.vim
+" Bundle 'itchyny/lightline.vim'
+" --------------- ------ ---------------
+
+" --------------- Tagbar ---------------
+"
+Bundle 'majutsushi/tagbar'
+
+" let g:tagbar_ctags_bin='C:\ProgramData\chocolatey\bin\ctags.exe'
+
+let g:tagbar_type_ps1 = {
+    \ 'ctagstype' : 'powershell',
+    \ 'kinds'     : [
+        \ 'f:function',
+        \ 'i:filter',
+        \ 'a:alias'
+    \ ]
+\ }
+
+set <F8>=<C-v><F8>
+noremap <F8> :TagbarToggle<CR>
+
+" :TagbarOpenAutoClose                                    *:TagbarOpenAutoClose*
+    " Open the Tagbar window, jump to it and close it on tag selection. This is
+    " an alias for ":TagbarOpen fjc".
+set <F7>=<C-v><F7>
+noremap <F7> :TagbarOpenAutoClose<CR>
+
+
+" 
+" ------------- TESTING
+"  Not sure I like this yet...
+" Bundle 'vim-scripts/AutoComplPop'
+" ------------- END TESTING
+"
+
+" Not ready for this yet.  Supposed to implement Perl-style regex.
+" Need to do more research.
+" Bundle 'othree/eregex.vim'
+
+" Sparkup is for easy HTML coding
+"   Don't remember the equivalent on VisStudio - 'fluent'?
+" Bundle 'rstacruz/sparkup'
+"
+
+" -----  Color schemes
+Bundle 'cocopon/iceberg.vim'
+Bundle 'Lokaltog/vim-distinguished'
+" Bundle 'altercation/vim-colors-solarized'
+Bundle 'matthewtodd/vim-twilight'
+Bundle 'vim-scripts/phd'
+
+filetype plugin indent on     " required
+
+"
+" ------- END VUNDLE ------------------------------
+"
+
+" let g:syntastic_js_checkers = ['jslint']
+" let g:syntastic_javascript_checkers = ['jslint']
+
+" vim-sessions plugin
+let g:session_autosave='yes'
+let g:session_autosave_periodic=5
+let g:session_verbose_messages=0
+let g:session_default_to_last='yes'
+
+filetype plugin indent on       " enable detection, plugins and indenting in one step
+
+"
+let g:signify_vcs_list = [ 'git', 'svn' ]
+
+set diffexpr=MyDiff()
+set ignorecase
+set incsearch
+set nowrap
+" set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]%{fugitive#statusline()}
+set showmatch
+set mat=30
+set matchpairs+=<:>
+
+" From: http://vim.wikia.com/wiki/Change_statusline_color_to_show_insert_or_normal_mode
+" first, enable status line always
+" set laststatus=2
+
+" DONT LIKE THIS COLOR CHOICE
+" now set it up to change the status line based on mode
+" if version >= 700
+  " au InsertEnter * hi StatusLine term=reverse ctermbg=5 gui=undercurl guisp=Magenta
+  " au InsertLeave * hi StatusLine term=reverse ctermfg=0 ctermbg=2 gui=bold,reverse
+" endif
+" -----------------------
+
+"  From fugitive help
+" set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-14.(%l,%c%V%)\ %P
+set guioptions=egmrLtTb
+
+" For gvim on Surface Pro 3
+if $COMPUTERNAME == "cbSurface3"
+    set guifont=Consolas:h12:cANSI
+"   echo "cbSurface3"
+elseif $COMPUTERNAME == "Blargle"
+    echo "Blargle"
+else
+"   echo $COMPUTERNAME
+    set hidden
+endif
+
+" with hidden=on, when switching away from a buffer the buffer is hiddden,not closed.
+" with hidden=off, switching away from edited buffer will provoke the 
+" 'unsaved changes' warning
+set hidden
+set autowrite
+
+" According to Help, when autochdir is 'on' some plugins might not work as
+" expected.
+set autochdir
+set wildmode=list:longest
+set wildmenu
+
+" basic yank/delete will go to Windows clipboard
+:set clipboard=unnamed
+
+" colorscheme phd
+" colorscheme desert
+" colorscheme darkblue
+colorscheme iceberg
+
+" 4 stops
+set tabstop=4
+set shiftwidth=4
+
+" for zt, zb, leave 3 lines of breathing room
+set scrolloff=2
+
+" Spaces instead of tabs
+set expandtab
+
+" From:  http://amix.dk/vim/vimrc.html ------------
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
+" When searching try to be smart about cases 
+set smartcase
+
+" Highlight search results
+set hlsearch
+
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+" For regular expressions turn magic on
+set magic
+
+set nobackup
+"
+" Disable highlight when <leader><cr> is pressed
+map <silent> <leader><cr> :noh<cr>
+
+
+" From: http://stackoverflow.com/a/4468491/107037
+" Close buffer w/o closing window (when in split window)
+nmap <silent> <leader>d :bp\|bd #<CR>
+" End From -----------------------------------------
+
+if has('win32')
+  " Avoid mswin.vim making Ctrl-v act as paste
+  noremap <C-V> <C-V>
+  " something was mapping C-Y to C-R (redo) 
+  " -- C-Y should be scroll screen in normal mode
+  noremap <C-Y> <C-Y>
+endif
+
+"
+" ---------------  KEY MAPPING ----------------------------
+"
+" From: http://stackoverflow.com/a/4848672/107037
+    " i to into Insert mode, ii to leave Insert mode
+inoremap ii <Esc> 
+    " Ctrl-c also returns to Normal mode.
+
+" From:  http://stackoverflow.com/a/4522351
+" inoremap { {<CR>}<Esc>ko
+
+" ------------ <leader>  mappings  <leader> is '\' key -------------------
+" 
+" ------------  Unite mappings
+nnoremap <leader>f :<C-u>Unite file<CR>
+" nnoremap <leader>ff :<C-u>UniteWithBufferDir -start-insert file<CR>
+" nnoremap <leader>fr :<C-u>Unite -start-insert file_rec<CR>
+
+" call unite#filters#matcher_default#use(['matcher_fuzzy'])
+map <leader>mru :Unite -start-insert file_mru<cr>
+map <leader>be :Unite buffer<cr>
+
+" Yank history
+let g:unite_source_history_yank_enable = 1
+nnoremap <leader>y :<C-u>Unite history/yank<CR> 
+
+" Insert file bookmark
+nnoremap <silent> <leader>fbm :<C-u>UniteBookmarkAdd<CR>
+" Browse bookmarks
+nnoremap <silent> <leader>bm :<C-u>Unite bookmark<CR>
+
+let g:neomru#do_validate=1
+let g:neomru#file_mru_limit=40
+call unite#custom#source('file_mru,file_rec,file_rec/async,ack,ag', 'ignore_pattern', join(['\.git/', '\.tmp/', 'Temp/', 'tmp/', 'bundle/'], '\|'))
+
+" Load dbScratch.txt
+" nnoremap <silent> <leader>sc :<C-u>e C:\Users\hxchba\Dropbox\scratch\dbScratch.txt<CR>
+
+
+"
+" ------------ tab command mappings
+"
+map <leader>tt :tabnew<cr>
+map <leader>tn :tabnext<cr>
+map <leader>tp :tabprevious<cr>
+map <leader>tc :tabclose<cr>
+
+
+" Re-map '<' and '>' to perform their normal action, but then maintain the
+" selection so the action can immediately be performed again.
+vmap < <gv
+vmap > >gv
+
+" From: http://vim.wikia.com/wiki/Delete_files_with_a_Vim_command
+" command! -complete=file -nargs=1 Remove :echo 'Remove: '.'<f-args>'.' '.(delete(<f-args>) == 0 ? 'SUCCEEDED' : 'FAILED')
+
+
+" BefExplorer has been replaced by Unite
+" let g:BufExplorerShowRelativevPath=0
+
+
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+endfunction
+
+if !exists("autocommands_loaded")
+    let autocommands_loaded = 1
+    au FocusLost * wa
+    "
+    " Hell, yeah, this is what I'm talking about:  http://goo.gl/8V8AFH
+    au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+
+    " fdm is FoldMethod, fml is FoldMinLines
+    autocmd FileType cs setlocal fdm=indent fml=1 shiftwidth=2 tabstop=2 cms="// %s"
+    autocmd FileType css setlocal fdm=indent fml=1 shiftwidth=2 tabstop=2
+    autocmd FileType ps1 setlocal fdm=indent fml=1 
+    autocmd FileType linq setlocal cms="// %s" fdm=indent fml=1 
+
+    " for NERDTree, which seems to interfere with Signify.
+    " `autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif`
+   let g:ps1_nofold_blocks = 1
+endif
+
+" TextWidth and FormatOptions
+" au FileType readme tw=72, fo+=t
+au FileType txt tw=72, fo+=t
+au BufNewFile,BufRead *.linq set filetype=cs
+"
+" PowerShell
+au BufNewFile,BufRead *.ps1,*.psm1,*.psd1 setf ps1
+" if has("gui_running")
+    " autocmd BufEnter *.ps1 nested TagbarOpen
+    " autocmd BufEnter *.psm1 nested TagbarOpen
+" endif
+
+
+" Don't want ps1 files auto-folded when opened
+au BufReadPost *.ps1 normal zR
+au BufAdd *.ps1 normal zR
+autocmd Syntax ps1 normal zR
+au BufReadPost *.psm1 normal zR
+au BufAdd *.psm1 normal zR
+autocmd Syntax psm1 normal zR
+
+" Don't want linq files auto-folded when opened
+au BufReadPost *.linq normal zR
+au BufAdd *.linq normal zR
+autocmd Syntax linq normal zR
+"
+" Don't want C# files auto-folded when opened
+au BufReadPost *.cs normal zR
+au BufAdd *.cs normal zR
+autocmd Syntax cs normal zR
+
+
+let NERDSpaceDelims=1
+
+:highlight Folded  guifg=white
+
+command! CopyFileName let @*=substitute(expand("%:p"), '/', '\', 'g')
+
+
+

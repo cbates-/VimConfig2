@@ -1,0 +1,7 @@
+set nocompatible
+set runtimepath+=$_CommonConfig/vim
+
+source $_CommonConfig/vim/_vsvimrcCommon
+
+" let g:tagbar_ctags_bin='C:\bin\ctags58\ctags.exe'
+

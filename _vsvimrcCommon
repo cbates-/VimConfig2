@@ -1,0 +1,164 @@
+set nocompatible
+source $VIMRUNTIME/vimrc_example.vim
+source $VIMRUNTIME/mswin.vim
+behave mswin
+
+" NOT SURE WHICH OF THESE VSVIM PAYS ATTENTION TO.
+set ignorecase
+set incsearch
+set nowrap
+" with hidden=on, when switching away from a buffer the buffer is hiddden,not closed.
+" with hidden=off, switching away from edited buffer will provoke the 
+" 'unsaved changes' warning
+set hidden
+set autowrite
+" basic yank/delete will go to Windows clipboard
+:set clipboard=unnamed
+
+" 4 stops
+set tabstop=4
+set shiftwidth=4
+
+" for zt, zb, leave 3 lines of breathing room
+set scrolloff=2
+
+set sidescroll=4
+set sidescrolloff=4
+
+
+" Spaces instead of tabs
+set expandtab
+set shiftwidth=4
+set cursorline
+" Re-map '<' and '>' to perform their normal action, but then maintain the
+" selection so the action can immediately be performed again.
+vmap < <gv
+vmap > >gv
+" Hell, yeah, this is what I'm talking about:  http://goo.gl/8V8AFH
+au BufWinLeave * call feedkeys("\<C-\>\<C-n>")
+" au BufWinLeave * stopinsert
+" au BufEnter * stopinsert
+
+inoremap ii <Esc> 
+
+" gd -> go to definition (same as F12)
+" From: https://fuqua.io/blog/2017/08/level-up-your-vsvim/
+map gi :vsc Edit.GoToImplementation<CR>
+map gd :vsc Edit.GoToDefinition<CR>
+
+" In Vim, zE = 'Eliminate all folds'
+" In VS, it will be ToggleAllOutlining.
+map zE :vsc Edit.ToggleAllOutlining<CR>
+
+"  Will this work in VisStudio?
+" au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+
+function MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  let eq = ''
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      let cmd = '""' . $VIMRUNTIME . '\diff"'
+      let eq = '"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
+endfunction
+
+if !exists("autocommands_loaded")
+    let autocommands_loaded = 1
+    au FocusLost * wa
+    "
+    " Hell, yeah, this is what I'm talking about:  http://goo.gl/8V8AFH
+    au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+
+    " fdm is FoldMethod, fml is FoldMinLines
+    autocmd FileType cs setlocal fdm=indent fml=1 shiftwidth=4 tabstop=4 cms="// %s"
+    autocmd FileType css setlocal fdm=indent fml=1 shiftwidth=2 tabstop=2
+    autocmd FileType ps1 setlocal fdm=indent fml=1 
+    autocmd FileType linq setlocal cms="// %s" fdm=indent fml=1 
+
+    " From 'Learning the Vi and Vim Editors' 
+    " Took some tuning, but finally got it working
+    au FileWritePre,BufWritePre *.ps1 mark s|call LastMod()|'s 
+    au FileWritePre,BufWritePre *.psm1 mark s|call LastMod()|'s 
+    au FileWritePre,BufWritePre *.psd1 mark s|call LastMod()|'s 
+    fun LastMod() 
+        " if there are more than 20 lines, set our max to 20, otherwise, scan 
+        " entire file. 
+        if line(" $") > 20 
+            let lastModifiedline = 20 
+        else 
+            let lastModifiedline = line(" $") 
+        endif 
+        " exe "1," . lastModifiedline . "g/ Last modified: /s/ Last modified: .*/ Last modified: " strftime("%Y %b %d") 
+        exe "1,$g/ last modified: /s/ last modified: .*/ Last Modified: " strftime("%Y %b %d %X") 
+    endfun
+
+
+
+    " for NERDTree, which seems to interfere with Signify.
+    " `autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | endif`
+   let g:ps1_nofold_blocks = 1
+endif
+
+" ---------------------------  AutoLoad  ---------------------------------
+" TextWidth and FormatOptions
+" au FileType readme tw=72, fo+=t
+au FileType txt tw=72, fo+=t
+au BufNewFile,BufRead *.linq set filetype=cs
+au FileReadPre,BufReadPre *.ini  set readonly
+au FileReadPre,BufReadPre *.log  set readonly
+"
+" PowerShell
+au BufNewFile,BufRead *.ps1,*.psm1,*.psd1 setf ps1
+" if has("gui_running")
+    " autocmd BufEnter *.ps1 nested TagbarOpen
+    " autocmd BufEnter *.psm1 nested TagbarOpen
+" endif
+
+
+" Don't want ps1 files auto-folded when opened
+au BufReadPost *.ps1 normal zR
+au BufAdd *.ps1 normal zR
+autocmd Syntax ps1 normal zR
+au BufReadPost *.psm1 normal zR
+au BufAdd *.psm1 normal zR
+autocmd Syntax psm1 normal zR
+
+" Don't want linq files auto-folded when opened
+au BufReadPost *.linq normal zR
+au BufAdd *.linq normal zR
+autocmd Syntax linq normal zR
+"
+" Don't want C# files auto-folded when opened
+au BufReadPost *.cs normal zR
+au BufAdd *.cs normal zR
+autocmd Syntax cs normal zR
+
+
+let NERDSpaceDelims=1
+
+:highlight Folded  guifg=white
+
+command! CopyFileName let @*=substitute(expand("%:p"), '/', '\', 'g')
+
+if !exists("autocommands_loaded")
+    let autocommands_loaded = 1
+    au FocusLost * wa
+    "
+    " Hell, yeah, this is what I'm talking about:  http://goo.gl/8V8AFH
+	au FocusLost,TabLeave * call feedkeys("\<C-\>\<C-n>")
+endif

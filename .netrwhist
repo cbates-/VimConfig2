@@ -1,0 +1,7 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =5
+let g:netrw_dirhist_1='c:/users/charles/onedrive/PowerShell'
+let g:netrw_dirhist_2='c:/users/charles/onedrive'
+let g:netrw_dirhist_3='c:/users/charles'
+let g:netrw_dirhist_4='c:/users/charles/Documents'
+let g:netrw_dirhist_5='c:/users/charles/Documents/WindowsPowerShell'
